@@ -118,12 +118,7 @@ module Growthbook
       when '$gte'
         attribute_value >= condition_value
       when '$regex'
-        silence_warnings do
-          re = Regexp.new(condition_value)
-          !!attribute_value.match(re)
-        rescue StandardError
-          false
-        end
+        validate_regexp(condition_value, attribute_value)
       when '$in'
         condition_value.include? attribute_value
       when '$nin'
@@ -159,6 +154,15 @@ module Growthbook
       else
         false
       end
+    end
+
+    def self.validate_regexp(condition_value, attribute_value)
+      silence_warnings do
+        re = Regexp.new(condition_value)
+        !!attribute_value.match(re)
+      end
+    rescue StandardError
+      false
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original
